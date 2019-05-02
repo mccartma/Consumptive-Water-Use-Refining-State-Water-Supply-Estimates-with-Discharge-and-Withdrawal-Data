@@ -1,37 +1,49 @@
-## Welcome to GitHub Pages
+# Consumptive Water Use: Refining State Water Supply Estimates with Discharge and Withdrawal Data
 
-You can use the [editor on GitHub](https://github.com/mccartma/Consumptive-Water-Use-Refining-State-Water-Supply-Estimates-with-Discharge-and-Withdrawal-Data/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
+## Description
+This repository is intended to hold code and documentation for Morgan McCarthy's Master's thesis conducted through Virginia Tech and Virginia's Department of Environemtnal Quality's Office of Water Supply. 
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+Assembled: 05/02/2019
 
-### Markdown
+![](https://github.com/mccartma/USGS_Consumptive_Use/blob/master/Script_Mapping/Morgan%20Code%20Flow%20Chart.jpg)
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+## Contributors
 
-```markdown
-Syntax highlighted code block
+##### Robert Burgholzer
 
-# Header 1
-## Header 2
-### Header 3
+Surface Water Modeler | Office of Water Supply | Virginia Department of Environmental Quality
 
-- Bulleted
-- List
+<Robert.Burgholzer@deq.virginia.gov>
+    
+##### Joseph Kleiner
 
-1. Numbered
-2. List
+Senior Surface Water Modeler | Virginia Department of Environmental Quality
 
-**Bold** and _Italic_ and `Code` text
+B.S. Biological Systems Engineering | Virginia Tech | 2016
 
-[Link](url) and ![Image](src)
-```
+<joseph.kleiner@deq.virginia.gov>
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+##### Dr. Julie Shortridge
 
-### Jekyll Themes
+Assistant Profesor & Extension Specialist | Virginia Tech | Department of Biological Systems Engineering
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/mccartma/Consumptive-Water-Use-Refining-State-Water-Supply-Estimates-with-Discharge-and-Withdrawal-Data/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+Ph.D Geography and Environmental Engineering | Johns Hopkins University | 2016
 
-### Support or Contact
+<jshortridge@vt.edu>
+    
+##### Dr. Durelle Scott
+Assistant Professor | Virginia Tech | Department of Biological Systems Engineering
 
-Having trouble with Pages? Check out our [documentation](https://help.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+Ph.D Civil Engineering | University of Colorado at Boulder | 2001
+
+<dscott@vt.edu>
+
+##### Connor Brogan
+B.S./M.S. Biological Systems Engineering | Virginia Tech | 2018
+
+<connorb5@vt.edu>
+
+##### Morgan McCarthy
+M.S Biological Systems Engineering | Virginia Tech | 2019
+
+<mccartma@vt.edu>
