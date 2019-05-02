@@ -5,7 +5,7 @@ This repository is intended to hold code and documentation for Morgan McCarthy's
 
 Assembled: 05/02/2019
 
-![](https://github.com/mccartma/USGS_Consumptive_Use/blob/master/Script_Mapping/Morgan%20Code%20Flow%20Chart.jpg)
+![](https://github.com/mccartma/Consumptive-Water-Use-Refining-State-Water-Supply-Estimates-with-Discharge-and-Withdrawal-Data/blob/master/Code%20Flow%20Chart.jpg)
 
 ## Contributors
 
