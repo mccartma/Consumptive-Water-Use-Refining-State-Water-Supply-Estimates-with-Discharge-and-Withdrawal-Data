@@ -2,15 +2,15 @@
 ###############################################Virginia Water Use Database System (VWUDS)##################################################
 
 # This code serves to import and analyze withdrawal data from the Virginia Water Use Database System (VWUDS).
-# VWUDS is maintained by Virginia's Department of Environmental Qualtiy (VDEQ) and is self reported by water users. 
-# The DEQ only requires users to obtain a permit if 300,000 gallons or more are withdrawn per month from either surface or groundwater sources (White, 2016). 
+# VWUDS is maintained by Virginia's Department of Environmental Qualtiy (VDEQ) and is self reported by water users.
+# The DEQ only requires users to obtain a permit if 300,000 gallons or more are withdrawn per month from either surface or groundwater sources (White, 2016).
 
 # Since the water withdrawals are self reported, QA/QC measures need to be taken. The main source of error is centered on source coordinates.
-#Sources are similar to outfalls; structures that withdraw water from either surface or groundwater.
+# Sources are similar to outfalls; structures that withdraw water from either surface or groundwater.
 
 # This script first identifies suspicious source coordinates (from 1982-2015) and merges manual corrections to those flagged data points.
 # Coordinates that were deemed suspicious:
-      #a. did not fit within the bounding box of VA, 
+      #a. did not fit within the bounding box of VA,
       #b. had switched negative signs/lacked negative signs for longitude
       #c. were missing and were found using google maps/earth
       #(Manual Corrections were performed during Fall of 2017)
@@ -54,9 +54,10 @@ options(digits=9) #Digits to 9 decimal points
 VWUDS_monthly<- function(){
   # Name of View: VWUDS Monthly Water Use (DH Feature) 
   # Link to this View: http://deq1.bse.vt.edu/d.dh/vwuds-monthly-water-use?hydrocode=&hydroid=&name_op=%3D&name=&tstime_op=between&tstime%5Bvalue%5D=&tstime%5Bmin%5D=2010-01-01&tstime%5Bmax%5D=2017-12-31&bundle%5B%5D=well&bundle%5B%5D=intake&fstatus_1_op=not+in&fstatus_1%5B%5D=duplicate&name_1_op=%3D&name_1=&propcode_op=%3D&propcode=&ftype_op=%3D&ftype=
-  VWUDS_2010_2017<-read.csv("G:/My Drive/VWUDS Data/vwuds_monthly_wateruse.csv", sep=",", header=T)
+  VWUDS_2010_2017<-read.csv("G:/My Drive/VWUDS Data/vwuds_monthly_wateruse_2.csv", sep=",", header=T)
   VWUDS_2010_2017<-as.data.table(VWUDS_2010_2017) # setting type to data table makes manipulation easier
   names(VWUDS_2010_2017)[2]<-c("Facility.ID")
+  names(VWUDS_2010_2017)[3]<-c("Hydrocode")
   
   #---------------------------------------------#
   #---------Set Data Type for Attributes--------#
@@ -82,6 +83,8 @@ VWUDS_monthly<- function(){
   
   #---------------------------------------------#
   #------------Convert MGM to MGD---------------#
+  VWUDS_2010_2017$Million.Gallons.Month[VWUDS_2010_2017$Facility.ID=="67334"&substr(VWUDS_2010_2017$Date,1,4)=="2016"]<-0.0216
+  
   VWUDS_2010_2017<-VWUDS_2010_2017%>%add_column(Withdrawals_MGD=NA, .after="Million.Gallons.Month")
   
   # Divide by number of days in specific month to account for leap years in 2012 and 2016 #
@@ -94,6 +97,8 @@ VWUDS_monthly<- function(){
 }
 VWUDS_monthly()
 
+load("G:/My Drive/ECHO NPDES/USGS_Consumptive_Use_Updated/Code/R Workspaces/VWUDS_2010_2017.RData")
+VWUDS_2010_2017<-VWUDS_2010_2017[VWUDS_2010_2017$Date %within% interval("2010-01-01","2016-12-31"),]
 
 ######################################################################################
 #------------------------Flag Anamolous Coordinates----------------------------------#
@@ -263,6 +268,8 @@ common_corpus(Wateruse,"commercial")
 common_corpus(Wateruse,"mining")
 common_corpus(Wateruse,"manufacturing")
 
+count(Wateruse,Facility_Type)
+
 #----------------------#
 
 unique(Wateruse$Facility_Type)
@@ -377,11 +384,14 @@ reclass<- function(Wateruse){
                length(grep('\\bNURSERY\\b',Wateruse$Facility_Name[i]))>0|
                length(grep('\\bNURSERIES\\b',Wateruse$Facility_Name[i]))>0|
                length(grep('\\bVINEYARD\\b',Wateruse$Facility_Name[i]))>0|
-               length(grep("\\bFISHERIES\\b",Wateruse$Facility_Name[i]))>0|
-               length(grep("\\bFISH\\b",Wateruse$Facility_Name[i]))>0|
-               length(grep("\\bHATCHERY\\b",Wateruse$Facility_Name[i]))>0|
                length(grep("\\bGREENHOUSE\\b",Wateruse$Facility_Name[i]))>0){
       Wateruse$Reclass_Use_Type[i]<-'Agriculture/Irrigation'
+    } else if (length(grep("\\bFISHERIES\\b",Wateruse$Facility_Name[i]))>0|
+               length(grep("\\bTROUT\\b",Wateruse$Facility_Name[i]))>0|
+               length(grep("\\bCULTURAL\\b",Wateruse$Facility_Name[i]))>0|
+               length(grep("\\bFISH\\b",Wateruse$Facility_Name[i]))>0|
+               length(grep("\\bHATCHERY\\b",Wateruse$Facility_Name[i]))>0){
+      Wateruse$Reclass_Use_Type[i]<-'Aquaculture'
     } else if (length(grep('\\bPLANT\\b',Wateruse$Facility_Name[i]))>0|
                length(grep('\\bPAPER\\b',Wateruse$Facility_Name[i]))>0|
                length(grep('\\bCONCRETE\\b',Wateruse$Facility_Name[i]))>0|
@@ -479,8 +489,8 @@ change_use<- function(VWUDSID,new_sector){
   assign('VWUDS_2010_2017',VWUDS_2010_2017,envir=.GlobalEnv)
 }
 change_use("67334","Commercial")
-change_use("73898","Agriculture/Irrigation")
-change_use("73058","Agriculture/Irrigation")
+change_use("73898","Aquaculture")
+change_use("73058","Aquaculture")
 change_use("74032","Commercial")
 change_use("73140","Commercial")
 change_use("74059","Commercial")
@@ -498,6 +508,8 @@ change_use("72534","Commercial")
 change_use("67255","Commercial")
 change_use("72791","Commercial")
 change_use("73171","Industrial")
+change_use("73152","Aquaculture")
+change_use("73163","Aquaculture")
 
 #--Number of Reporting Months for each Source per Year--#
 W_Months<-
@@ -532,18 +544,39 @@ Facility_Withdrawals<-Source_Withdrawals%>%
   dplyr::group_by(Facility.ID,Year)%>%
   dplyr::summarise(Facility_Name=first(Facility_Name),
                    Sources=n_distinct(DEQ.ID.of.Source),
-                   entries=n(),
+                   entries=sum(entries),
                    Source.Type=first(Source.Type),
                    Withdrawals_MGal=sum(Withdrawals_MGal,na.rm=T),
                    Withdrawals_MGD=sum(Withdrawals_MGD,na.rm=T),
                    Sector=first(Sector))%>%arrange(desc(Withdrawals_MGD))
 
-Facility_Withdrawals%>%dplyr::group_by(Year)%>%
-                dplyr::summarise(no_Facilities=n_distinct(Facility.ID),no_sources=sum(Sources), entries=sum(entries),
+energy<-Facility_Withdrawals[Facility_Withdrawals$Sector=="Energy",]%>%
+  dplyr::group_by(Year)%>%
+                dplyr::summarise(no_Facilities=n_distinct(Facility.ID),no_sources=sum(Sources), 
+                entries=sum(entries),
                  Sum_Withdrawals_MGD=sum(Withdrawals_MGD,na.rm=T),Mean_Withdrawal_MGD=mean(Withdrawals_MGD,na.rm=T),
                  Median_Withdrawal_MGD=median(Withdrawals_MGD,na.rm=T))
 
+energy<-energy%>%
+  mutate(pct_change=round((Sum_Withdrawals_MGD/lag(Sum_Withdrawals_MGD) -1 )*100,digits=1))
+energy%>%summarise(mean(no_Facilities),mean(no_sources),mean(entries),mean(Sum_Withdrawals_MGD),mean(pct_change,na.rm=T))
+
+
+
+nonenergy<-Facility_Withdrawals[!Facility_Withdrawals$Sector=="Energy",]%>%
+  dplyr::group_by(Year)%>%
+  dplyr::summarise(no_Facilities=n_distinct(Facility.ID),no_sources=sum(Sources), 
+                   entries=sum(entries),
+                   Sum_Withdrawals_MGD=sum(Withdrawals_MGD,na.rm=T),Mean_Withdrawal_MGD=mean(Withdrawals_MGD,na.rm=T),
+                   Median_Withdrawal_MGD=median(Withdrawals_MGD,na.rm=T))
+
+nonenergy<-nonenergy%>%
+  mutate(pct_change=round((Sum_Withdrawals_MGD/lag(Sum_Withdrawals_MGD) -1 )*100,digits=1))
+nonenergy%>%summarise(mean(no_Facilities),mean(no_sources),mean(entries),mean(Sum_Withdrawals_MGD),mean(pct_change,na.rm=T))
+
+
 # Save Cleaned and Classified Withdrawal Data for Spatial Analysis 
+
 save(VWUDS_2010_2017,file="G:/My Drive/ECHO NPDES/USGS_Consumptive_Use_Updated/Code/R Workspaces/VWUDS_2010_2017.RData")
 
 #----------------------------------------------#
@@ -573,22 +606,28 @@ GW_v_SW<- function(){
     ax=0,
     ay=0
   )
-  plot_ly()%>%
+  plot1<-plot_ly()%>%
     add_pie(data=GW_vs_SW,labels=~Source.Type,values=~Withdrawals_MGD, name="Ground Water vs Surface Water",
             hole=0.6,
             textposition='outside',
             text=~paste0('<b>',Source.Type,'<b>',"\n", "~", round((Withdrawals_MGD/sum(Withdrawals_MGD))*100, 0), "%",'</b>'),
             textinfo='text',
             insidetextfont = list(color = '#FFFFFF', size=14),
-            outsidetextfont = list(color='#252525',size=14),
+            outsidetextfont = list(color='#252525',size=21),
             marker = list(colors=with_colors,line=list(color = '#FFFFFF', width =3)))%>%
     layout(showlegend=FALSE,
            xaxis = list(showgrid=F, zeroline=F, showticklabels=F),
            yaxis = list(showgrid=F, zeroline=F, showticklabels=F),
            autosize=T,margin=m,annotations=a)
   
+  path="G:/My Drive/USGS_ConsumptiveUse/Spring, 2019/Statewide Analysis/Withdrawals/"
+  file_name <- paste(path,"longterm_GW_vs_SW", ".pdf", sep="")
+  plotly_IMAGE(x=plot1,width=700,height=416,format="pdf",out_file=file_name)
+  
+  return(list(plot1))
+  
 }
-
+GW_v_SW()
 #----------------------------------------------#
 #------------Plot Use Type---------------------#
 
