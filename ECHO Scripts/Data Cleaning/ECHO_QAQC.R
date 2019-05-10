@@ -1,9 +1,10 @@
-#############################################################################################################################
-###########################################ECHO vs VPDES#####################################################################
+##################################################################################################################################
+#-----------------------------------------------------ECHO_QAQC.R----------------------------------------------------------------#
 
-#Primary Author: Morgan McCarthy, M.S. Biological Systems Engineering, Virginia Tech
+# Primary Author: Morgan McCarthy, M.S. Biological Systems Engineering, Virginia Tech
 
-#----------------------------------------------Purpose----------------------------------------------------------------------#
+##################################################################################################################################
+#-------------------------------------------------------Purpose------------------------------------------------------------------#
 
 # This script is intended to compare time series flows from CWA regulated facilities in the ECHO Database (ECHOInterface.R) to their respective 
 # VPDES Individual Permits. The Virginia Pollution Discharge Elimination System (VPDES) is administered 
@@ -13,7 +14,8 @@
 
 # Other flagging methdos are demonstrated in this script as well to note suspicious reported effluents. 
 
-#-----------------------------------------Library Initilization-------------------------------------------------------------#
+##################################################################################################################################
+#------------------------------------------------Load Library and Options--------------------------------------------------------#
 
 library(foreign) #allows for easy manipulation of *.dbf file types
 library(rgdal) #extract files from file geodatabases-like in ArcMap
@@ -36,8 +38,8 @@ library(tm)
 path<-"G:/My Drive/ECHO NPDES/USGS_Consumptive_Use_Updated"
 options(scipen=999) #Disable scientific notation
 
-#############################################################################################################################
-#-------------------------------------------ECHO Discharge Data-------------------------------------------------------------#
+##################################################################################################################################
+#------------------------------------------------ECHO Discharge Data-------------------------------------------------------------#
 
 #-----------------------------------------#
 #------------ECHO Facilities--------------#
@@ -62,16 +64,17 @@ VA_Facility_Pull<- function(state){
 VA_Facility_Pull("VA")
 
 table(ECHO_Facilities$CWPPermitTypeDesc)
+
 #-----------------------------------------#
 #-------Time series ECHO DMR Data---------# 
-#(Monthly, Daily, Weekly, Annual Average) 
-#**Rare to see averages other than monthly average**#
-#From ECHO_Timeseries.R Script: Uses Effluent Charts REST Services#
+# (Monthly, Daily, Weekly, Annual Average) 
+# **Rare to see averages other than monthly average**
+# From ECHO_Timeseries.R Script: Uses Effluent Charts REST Services#
 
 ECHO_Discharge<-read.table("G:/My Drive/ECHO NPDES/USGS_Consumptive_Use_Updated/Documentation/Imports/ECHO_timeseries_3_28.txt",header=T, sep="\t")
 
-#############################################################################################################################
-#----------------------------------------------VPDES Permit Data------------------------------------------------------------#
+##################################################################################################################################
+#---------------------------------------------------VPDES Permit Data------------------------------------------------------------#
 
 #This section of code retrieves the coordinates and flow limits for each point source discharging facility with an individual VPDES permit. 
 #General permits are written for a general class of discharges, while individual permits are for municipal and industrial facilities with effluent limitations and monitoring requirements.
@@ -311,7 +314,6 @@ attributes<- function(){
   
 }
 attributes()
-
 
 n_distinct(ECHO_2010_2017$Facility.ID)
 n_distinct(ECHO_2010_2017$OutfallID)
@@ -1019,6 +1021,7 @@ cumulative_outfalls("VA0004103",list("202","203","204","205"),"002")
 # This function narrows down the outfalls that are analyzed. Typically outfall 001 represents a facility,
 # however that is not always the case. This function swaps out the 001 outfall for one that represents the actual discharge
 # leaving the facility and going into open waters. 
+
 outfall.switch<- function(ECHO_2010_2017){
   #--Facilties that are represented with a different outfall rather than 001--#
   
@@ -1127,7 +1130,7 @@ missing<-subset(outfalls,!outfalls$Hydrocode %in% outfalls_post$Hydrocode)
 
 write.table(ECHO_2010_2017,paste0(path,"/ECHO_2010_2017_QAQC.txt"), sep="\t", row.names=F)
 
-#-------Summarize Data frame------------#
+#-------Summarize Data frame into Tables------------#
 
 Outfall_Discharges<-ECHO_2010_2017%>%
   dplyr::group_by(OutfallID,Year=substr(MP_Begin_Date,1,4))%>%
